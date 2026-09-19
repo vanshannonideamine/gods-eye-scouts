@@ -21,6 +21,7 @@ export function createApplicationViewer({ container, creditContainer }) {
     msaaSamples: 4,
     contextOptions: { webgl: { preserveDrawingBuffer: true } },
   });
+  window.__cesiumViewer = viewer;
   try {
     viewer.targetFrameRate = 60;
     viewer.scene.globe.show = false;

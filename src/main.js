@@ -1,3 +1,4 @@
+import './scouts/hook.js';
 import { createStandaloneApplication } from './standalone/application.js';
 import { describeError } from './standalone/errors.js';
 
@@ -14,4 +15,13 @@ application.start().catch((error) => {
   loaderStatus.style.color = '#ff4444';
 });
 
+window.__gevApp = application;
 export { application };
+
+import './scouts/panel.js';
+
+import './scouts/viewPatch.js';
+
+import './scouts/markers.js';
+
+import './scouts/buttons.js';
