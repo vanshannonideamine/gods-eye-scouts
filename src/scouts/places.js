@@ -28,6 +28,31 @@ console.log('[Scouts] places.js loaded');
     });
   }
 
+  function humanTimeAgo(ts) {
+    if (!ts) return '';
+    var d = Date.now() - ts;
+    var m = Math.floor(d / 60000);
+    if (m < 1) return 'just now';
+    if (m < 60) return m + ' min ago';
+    var h = Math.floor(m / 60);
+    if (h < 24) return h + 'h ago';
+    var dy = Math.floor(h / 24);
+    if (dy < 30) return dy + 'd ago';
+    var mo = Math.floor(dy / 30);
+    if (mo < 12) return mo + 'mo ago';
+    return Math.floor(mo / 12) + 'y ago';
+  }
+
+  function haversineKm(lat1, lon1, lat2, lon2) {
+    var R = 6371;
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLon = (lon2 - lon1) * Math.PI / 180;
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
   function render() {
     var el = document.getElementById('ges-places-list');
     if (!el) return;
@@ -37,6 +62,14 @@ console.log('[Scouts] places.js loaded');
       return;
     }
     var pending = false;
+
+    // Compute proximity cluster size for each item (reports within 5km)
+    items.forEach(function(it){
+      it.nearby = items.filter(function(o){
+        return o !== it && haversineKm(it.lat, it.lon, o.lat, o.lon) < 5;
+      }).length;
+    });
+
     el.innerHTML = items.map(function(it){
       var name = it.name;
       var sub;
@@ -48,12 +81,18 @@ console.log('[Scouts] places.js loaded');
         sub = '<div style="font-size:13px;font-weight:600;color:#8b95a3;margin-bottom:2px">Locating\u2026</div>';
       }
       var preview = it.first ? esc(it.first.slice(0, 60)) + (it.first.length > 60 ? '\u2026' : '') : '';
+
+      // Context line: reports, recency, proximity cluster
+      var ctx = it.count + ' report' + (it.count === 1 ? '' : 's');
+      if (it.lastTs) ctx += ' \u00B7 ' + humanTimeAgo(it.lastTs);
+      if (it.nearby > 0) ctx += ' \u00B7 ' + it.nearby + ' nearby';
+
       return '<div class="ges-place" data-coord="' + it.coord + '" style="padding:12px 16px;border-bottom:1px solid #232b36;cursor:pointer;transition:background .12s">' +
         '<div style="display:flex;gap:12px;align-items:flex-start">' +
           '<div style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:#ff9500;color:#0a0e14;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center">' + it.index + '</div>' +
           '<div style="flex:1;min-width:0">' +
             sub +
-            '<div style="font-size:11px;color:#8b95a3">' + it.count + ' report' + (it.count === 1 ? '' : 's') + '</div>' +
+            '<div style="font-size:11px;color:#8b95a3">' + esc(ctx) + '</div>' +
             (preview ? '<div style="font-size:11px;color:#5c6675;margin-top:3px;font-style:italic">"' + preview + '"</div>' : '') +
           '</div>' +
           '<div style="flex-shrink:0;color:#ff9500;font-size:11px;font-weight:600;align-self:center">VIEW \u2192</div>' +
@@ -89,8 +128,8 @@ console.log('[Scouts] places.js loaded');
     h.style.cssText = 'position:absolute;top:56px;right:16px;left:16px;background:#151b24;border:1px solid #2d3845;border-radius:6px;padding:14px 16px;font-size:12px;line-height:1.6;color:#8b95a3;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.6)';
     h.innerHTML =
       '<div style="font-weight:600;color:#e6edf3;margin-bottom:6px">What is a Scout Place?</div>' +
-      'Each numbered item is a location where someone posted a scout report &mdash; an observation, evidence, hypothesis, or question about that specific place on Earth.<br><br>' +
-      'The number matches the marker on the globe. Click a numbered marker to open its report. Click a report below to fly the globe to that marker.<br><br>' +
+      'Each numbered item is a location where someone posted a scout report. The number matches the marker on the globe.<br><br>' +
+      'The line under each name shows: number of reports, how recent the latest one is, and how many other scout reports are nearby (within 5km).<br><br>' +
       '<span style="color:#ff9500">VIEW \u2192</span> flies the camera to that location.';
     document.getElementById('ges-places-drawer').appendChild(h);
   }

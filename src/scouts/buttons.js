@@ -13,20 +13,82 @@ console.log('[Scouts] buttons.js loaded');
 
     var wrap = document.createElement('div');
     wrap.id = 'ges-scouts-pills';
-    wrap.style.cssText = 'position:fixed;right:20px;bottom:20px;z-index:9998;display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-family:-apple-system,system-ui,sans-serif';
+    wrap.style.cssText = [
+      'position:fixed',
+      'left:20px',
+      'bottom:52px',
+      'z-index:9998',
+      'display:flex',
+      'flex-direction:column',
+      'gap:6px',
+      'align-items:flex-start',
+      'font-family:"JetBrains Mono",ui-monospace,Menlo,monospace'
+    ].join(';');
 
     var postBtn = document.createElement('button');
     postBtn.id = 'ges-scouts-post';
-    postBtn.textContent = '\u2295  POST SCOUT REPORT';
-    postBtn.style.cssText = 'background:#0f141b;border:2px solid #ff9500;color:#ff9500;padding:12px 20px;border-radius:6px;font-size:13px;font-weight:600;letter-spacing:.5px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.6);text-transform:uppercase;font-family:inherit';
+    postBtn.textContent = '+ POST SCOUT REPORT';
+    postBtn.style.cssText = [
+      'background:rgba(12,12,20,0.72)',
+      'border:1px solid rgba(0,212,255,0.28)',
+      'color:#00d4ff',
+      'padding:9px 14px',
+      'border-radius:3px',
+      'font-family:inherit',
+      'font-size:10px',
+      'font-weight:500',
+      'letter-spacing:1.2px',
+      'text-transform:uppercase',
+      'cursor:pointer',
+      'backdrop-filter:blur(8px)',
+      '-webkit-backdrop-filter:blur(8px)',
+      'transition:all .18s ease',
+      'box-shadow:0 1px 12px rgba(0,0,0,0.4)'
+    ].join(';');
+    postBtn.addEventListener('mouseenter', function(){
+      postBtn.style.borderColor = 'rgba(0,212,255,0.7)';
+      postBtn.style.boxShadow = '0 0 16px rgba(0,212,255,0.28)';
+      postBtn.style.color = '#7ee7ff';
+    });
+    postBtn.addEventListener('mouseleave', function(){
+      postBtn.style.borderColor = 'rgba(0,212,255,0.28)';
+      postBtn.style.boxShadow = '0 1px 12px rgba(0,0,0,0.4)';
+      postBtn.style.color = '#00d4ff';
+    });
     postBtn.addEventListener('click', function(){ oldFab.click(); });
 
     var placesBtn = document.createElement('button');
     placesBtn.id = 'ges-scouts-places';
-    placesBtn.textContent = '\u25CE  SCOUT PLACES (0)';
-    placesBtn.style.cssText = 'background:#0f141b;border:2px solid #4ea1ff;color:#4ea1ff;padding:10px 20px;border-radius:6px;font-size:12px;font-weight:600;letter-spacing:.5px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.6);text-transform:uppercase;font-family:inherit';
+    placesBtn.textContent = '\u25CE SCOUT PLACES (0)';
+    placesBtn.style.cssText = [
+      'background:rgba(12,12,20,0.72)',
+      'border:1px solid rgba(255,255,255,0.08)',
+      'color:#c8d0d9',
+      'padding:8px 14px',
+      'border-radius:3px',
+      'font-family:inherit',
+      'font-size:10px',
+      'font-weight:500',
+      'letter-spacing:1.2px',
+      'text-transform:uppercase',
+      'cursor:pointer',
+      'backdrop-filter:blur(8px)',
+      '-webkit-backdrop-filter:blur(8px)',
+      'transition:all .18s ease',
+      'box-shadow:0 1px 12px rgba(0,0,0,0.4)'
+    ].join(';');
+    placesBtn.addEventListener('mouseenter', function(){
+      placesBtn.style.borderColor = 'rgba(255,255,255,0.22)';
+      placesBtn.style.color = '#ffffff';
+    });
+    placesBtn.addEventListener('mouseleave', function(){
+      placesBtn.style.borderColor = 'rgba(255,255,255,0.08)';
+      placesBtn.style.color = '#c8d0d9';
+    });
     placesBtn.addEventListener('click', function(){
-      if (window.__gesOpenPlaces) window.__gesOpenPlaces();
+      console.log('[Scouts] PLACES button clicked');
+      if (window.__gesOpenPlaces) { window.__gesOpenPlaces(); console.log('[Scouts] drawer opened'); }
+      else { console.warn('[Scouts] __gesOpenPlaces not defined'); }
     });
 
     function updateCount(){
@@ -38,7 +100,7 @@ console.log('[Scouts] buttons.js loaded');
           var b = store[k] || {};
           if ((b.threads || []).length > 0) n++;
         });
-        placesBtn.textContent = '\u25CE  SCOUT PLACES (' + n + ')';
+        placesBtn.textContent = '\u25CE SCOUT PLACES (' + n + ')';
       } catch(e){}
     }
     updateCount();
